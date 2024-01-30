@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.0/leaflet.css"/>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.0/leaflet.js"></script>
+    <script src='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.css' rel='stylesheet' />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/noframework.waypoints.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-pulse-icon@0.1.0/src/L.Icon.Pulse.css" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-pulse-icon@0.1.0/src/L.Icon.Pulse.js" crossorigin="anonymous"></script>
+  </head>
+
+<style>
+body {
+  font: normal 12px/20px 'Garamond', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: black;
+  box-sizing: border-box;
+  margin: 0;
+} 
+#wrapper {
+  width: 100%;
+  /* max-width: 800px; */
+  position: relative;
+  margin: 0 auto;
+  height: 600px;
+}
+.scroll-logo {
+  position:fixed;
+  top:200px;
+  left:50%;
+  width:80px;
+  height:80px;
+  margin-left: -40px;
+  z-index: 9999;
+  padding:5px;
+}
+.scroll-path{
+  stroke-width: 10;
+  stroke: #ffffff;
+}
+@keyframes blink2 {
+  100%,
+  0% {opacity:0.2;}
+  60% {opacity:1;}
+}
+.flash2 {
+  animation: blink2 1.2s infinite;
+}
+.mapbox { 
+  height: 600px; 
+  width: 100%;
+  /* max-width: 800px; */
+  margin: 0px;
+  position: fixed;
+  top:0px;
+  margin: auto 0px;
+  z-index: 0 !important;
+}
+
+.leaflet-bottom {
+	bottom: 1rem;
+}
+.leaflet-right {
+	right: 1rem;
+}
+.leaflet-tooltip-top:before, 
+.leaflet-tooltip-bottom:before, 
+.leaflet-tooltip-left:before, 
+.leaflet-tooltip-right:before {
+    border: none !important;
+}
+.leaflet-tooltip{
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 14px;
+  text-align: center;
+	color: #ffffff;
+  text-shadow: 2px 2px 1px rgba(0,0,0,0.2);
+  background-color: rgba(0,0,0,0) !important;
+  border:none !important;
+  box-shadow: none !important;
+}
+.countryLabel {
+  font-size: 16px;
+  font-weight: 500;
+  text-shadow: none;
+  line-height: normal;
+  color: rgba(255,255,255,0.7);
+}
+.leaflet-tooltip-pane {
+  z-index: 666;
+}
+.container {
+  padding-left: 40px;
+  padding-right: 40px;
+}
+#map-texts {
+  position: relative;
+  z-index: 999;
+}
+.scroll-text{
+  /* border: 1px solid #ddd; */
+  border: 0px;
+  padding: 15px;
+  border-radius: 5px;
+  max-width: 800px;
+  margin:0 auto;
+  /* background: rgba(255,255,255,.7); */
+  background: rgba(0,0,0,.6);
+  margin-bottom: 600px !important;
+}
+.scroll-text p {
+  font-size: 20px;
+  line-height: 140%;
+  color: #fff;
+  margin-top: 0px;
+}
+
+.scroll-text .title {
+  color: #fff;
+  text-align: center;
+  text-shadow: 2px 2px 1px rgba(0,0,0,0.5);
+  font-weight: 900;
+}
+#t16{
+  margin-bottom: 900px !important;
+}
+#tfirst, #tlast, #t16 {
+  border: 0px;
+  background: rgba(255,255,255,0);
+}
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+.arrow-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.arrow-icon > div {
+  margin-left: -1px;
+  margin-top: -3px;
+  transform-origin: center center;
+  font: 12px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+@media (max-width: 500px){
+  .scroll-text {
+    padding: 10px;
+  }
+  .scroll-text p {
+    font-size: 15px;
+    line-height: 140%;
+  }
+  .container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .leaflet-tooltip{
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 14px;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<div id="wrapper"> 
+    <div class="scroll-logo flash2">
+      <svg version="1.1" viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <g>
+         <path class="scroll-path" d="m459.38 227.5c-8.3125 0.11719-16.215 3.625-21.875 9.7109-0.80078-7.7891-4.582-14.969-10.551-20.035-5.9727-5.0703-13.668-7.6328-21.484-7.1602s-15.148 3.9453-20.465 9.6953c-0.82422-7.5234-4.4141-14.473-10.07-19.504-5.6602-5.0273-12.984-7.7734-20.555-7.707-8.5039 0.019531-16.543 3.8789-21.875 10.5v-98c0-10.941-5.8359-21.051-15.312-26.523-9.4766-5.4688-21.148-5.4688-30.625 0-9.4766 5.4727-15.312 15.582-15.312 26.523v271.25c0 39.074 20.848 75.184 54.688 94.723 33.84 19.535 75.535 19.535 109.38 0 33.84-19.539 54.688-55.648 54.688-94.723v-118.12c0-8.1211-3.2266-15.91-8.9688-21.656-5.7461-5.7422-13.535-8.9688-21.656-8.9688zm21.875 148.75c0 35.949-19.18 69.168-50.312 87.145-31.133 17.973-69.492 17.973-100.62 0-31.133-17.977-50.312-51.195-50.312-87.145v-271.25c0-7.8164 4.168-15.035 10.938-18.945 6.7695-3.9062 15.105-3.9062 21.875 0 6.7695 3.9102 10.938 11.129 10.938 18.945v179.38c0 2.418 1.957 4.375 4.375 4.375s4.375-1.957 4.375-4.375v-52.5c0-18.898 8.75-30.625 21.875-30.625 5.8008 0 11.367 2.3047 15.469 6.4062s6.4062 9.668 6.4062 15.469v70c0 2.418 1.957 4.375 4.375 4.375s4.375-1.957 4.375-4.375v-52.5c0-7.8164 4.168-15.035 10.938-18.945 6.7695-3.9062 15.105-3.9062 21.875 0 6.7695 3.9102 10.938 11.129 10.938 18.945v61.25c0 2.418 1.957 4.375 4.375 4.375s4.375-1.957 4.375-4.375v-43.75c0-7.8164 4.168-15.035 10.938-18.945 6.7695-3.9062 15.105-3.9062 21.875 0 6.7695 3.9102 10.938 11.129 10.938 18.945z"/>
+         <path class="scroll-path" d="m249.38 109.64c0.80078 0.83203 1.9062 1.3047 3.0625 1.3125 1.1836-0.003907 2.3164-0.47266 3.1484-1.3125 1.6797-1.7305 1.6797-4.4805 0-6.2109l-22.137-22.137-22.137 22.137c-0.82812 0.82031-1.293 1.9375-1.293 3.1055s0.46484 2.2852 1.293 3.1055c0.79297 0.84766 1.9023 1.3281 3.0625 1.3281s2.2695-0.48047 3.0625-1.3281l11.637-11.551v70.961l-11.637-11.547c-0.79297-0.84766-1.9023-1.3242-3.0625-1.3242s-2.2695 0.47656-3.0625 1.3242c-0.82812 0.82031-1.293 1.9414-1.293 3.1055 0 1.168 0.46484 2.2852 1.293 3.1055l22.137 22.137 3.0625-3.1484 19.074-18.988c1.6797-1.7305 1.6797-4.4805 0-6.2109-0.82031-0.82812-1.9375-1.293-3.1055-1.293-1.1641 0-2.2852 0.46484-3.1055 1.293l-11.551 11.551v-70.965z"/>
+        </g>
+       </svg>       
+    </div>
+    <div class="mapbox" id="map-container" ></div>
+    <div id="map-texts">
+      <div class="container">
+        <ul>
+          <li id="tfirst" class="scroll-text">
+          </li>
+          <li id="t1" class="scroll-text">
+            <!-- zoom out to show the border between Uganda and DRC -->
+            <p>Mpondwe border, for years, was the main entry route for Congolese timber destined to Uganda as well as that in transit to other countries.</p>
+          </li>
+          <li id="t2" class="scroll-text">
+            <!-- Zoom in to Mpondwe -->
+            <p>But a timber park established along the road to the border point, where trucks loaded with timber underwent scrutiny including asking for documentation to show timber they were ferrying had been logged legally changed the course.</p>
+          </li>
+          <li id="t3" class="scroll-text">
+            <!-- zoom out and pan to show both Mpondwe and Lia -->
+            <p>Timber traders moved almost 600km upwards to a place called Lia, northern Uganda, a less developed official border point.</p>
+          </li>
+          <li id="t4" class="scroll-text">
+            <!-- zoom to Lia -->
+            <p>Lia has become the main point for Congolese timber entering Uganda, our investigation reveals. Timber undergoes no scrutiny and is cleared with fake documents to enter Uganda for local market or in transit to other countries like Kenya.</p> 
+          </li>
+          <li id="t5" class="scroll-text">
+            <!-- Zoom out and show Paidha -->
+            <p>Beyond official border points where timber is cleared through bribery or with fake documents, there are unofficial entry points where traders in DRC and those in Uganda coordinate and move timber into Uganda mostly at night. That timber too ends up in the Kampala market.</p>
+          </li>
+          <li id="t6" class="scroll-text">
+            <!-- Pan to River Nile Bridge, zoom out -->
+            <p>On route to Kampala and transit to other countries, timber trucks pass through several check points on the roads including one at River Nile Bridge in Packwach.</p>
+          </li>
+          <li id="t7" class="scroll-text">
+            <!-- Zoom in to River Nile Bridge -->
+            <p>The Pakwach check point is manned by many government law enforcement agencies including National Forestry Authority which are supposed to ensure that only legal products pass. Illegal timber from Congo passes through the checkpoint.</p>
+          </li>
+          <li id="t8" class="scroll-text">
+            <!-- Zoom out and pan to Kampala -->
+            <p>Much of the timber from DRC ends up in large furniture making companies in Kampala. Timber also goes to large timber markets like Ndeeba, situated in the capital city. It's from these markets that the much loved Congolese timber is sold to small scale and medium scale furniture making companies.</p>
+          </li>
+          <li id="t9" class="scroll-text">
+            <!-- Zoom to Ndeeba -->
+            <p>Timber also goes to large timber markets like Ndeeba, situated in the capital city. It's from these markets that the much loved Congolese timber is sold to small scale and medium scale furniture making companies.</p>
+          </li>
+          <li id="t10" class="scroll-text">
+            <!-- Zoom out to include Malaba border and Kenya, draw arrow to Kenya -->
+            <p>Uganda is the main transit for Congolese timber that goes to Kenya. Timber passes through Malaba border which is the main border between Kenya and Uganda.</p> 
+          </li>
+          <li id="t16" class="scroll-text"></li>
+          <li id="tlast" class="scroll-text"></li>
+        </ul> 
+      </div> 
+    </div> 
+</div>  
+
+<script type="text/javascript">
+var defaultZoom;
+var incidentZoom;
+  endZoom = 17,
+  defaultCoor = [0.042666, 29.720726];
+
+if(window.innerWidth>500){
+  defaultZoom = 7;
+  incidentZoom = 17.5;
+} else if(window.innerWidth<500){
+  defaultZoom = 6;
+  incidentZoom = 16.5;
+}
+L.mapbox.accessToken = 'pk.eyJ1Ijoia3VhbmdrZW5nIiwiYSI6ImNsNXVibXhrNzBlNzUzamxhaHlrbHJsemcifQ.pi3jb5qDip_6YHTMDxDO5Q';
+// switch to this token when it is live on github
+// L.mapbox.accessToken = 'pk.eyJ1Ijoia3VhbmdrZW5nIiwiYSI6ImNsczBkYzZlNTAwM3Uya3F4MWJpdWRzanIifQ.SfPO15T7zjMdvdc3XVtoIA';
+
+
+var mymap = L.map('map-container',{
+  zoomControl:false, 
+  scrollWheelZoom:false, 
+  dragging:false, 
+  zoomSnap:0.1,
+  doubleClickZoom: false,
+  maxZoom:18,
+  minZoom:1,
+}).setView(defaultCoor, defaultZoom);
+
+L.tileLayer(
+    'https://api.mapbox.com/styles/v1/kuangkeng/cls0diajr009101pa8hkz67em/tiles/256/{z}/{x}/{y}@2x?access_token=' + L.mapbox.accessToken, {
+        tileSize: 512,
+        zoomOffset: -1,
+        attribution: '© <a href="https://www.mapbox.com/contribute/">Mapbox</a>'
+    }).addTo(mymap);
+
+const redIcon = L.icon.pulse({
+  iconSize: [10, 10],
+  color: 'rgba(244, 67, 54, 1)',
+}),
+
+dimIcon = L.divIcon({
+  html: `
+    <svg class="inline-circle" height="10" width="10">
+      <circle
+        style="fill:#CC0000;stroke:#CC0000;"
+        cx="5"
+        cy="5"
+        r="4"
+      />
+    </svg>`,
+  className: "",
+  iconAnchor: [5, 5],
+});
+
+// Remove white gridlines when zoomed in
+// if (window?.chrome !== undefined) {
+//   const originalInitTile = L.GridLayer.prototype._initTile;
+//   L.GridLayer.include({
+//     _initTile: function (tile) {
+//       originalInitTile.call(this, tile);
+//       const tileSize = this.getTileSize();
+//       tile.style.width = `${tileSize.x + 1}px`;
+//       tile.style.height = `${tileSize.y + 1}px`;
+//     }
+//   });
+// }
+
+// function to add arrows to polyline
+function getArrows(arrLatlngs, color, arrowCount, mapObj) {
+
+if (typeof arrLatlngs === undefined || arrLatlngs == null ||    
+(!arrLatlngs.length) || arrLatlngs.length < 2)          
+return [];
+
+if (typeof arrowCount === 'undefined' || arrowCount == null)
+    arrowCount = 1;
+
+if (typeof color === 'undefined' || color == null)
+    color = '';
+else
+    color = 'color:' + color;
+
+var result = [];
+for (var i = 1; i < arrLatlngs.length; i++) {
+    var icon = L.divIcon({ className: 'arrow-icon', bgPos: [5, 5], html: '<div style="' + color + ';transform: rotate(' + getAngle(arrLatlngs[i - 1], arrLatlngs[i], -1).toString() + 'deg)">▶</div>' });
+    for (var c = 1; c <= arrowCount; c++) {
+        result.push(L.marker(myMidPoint(arrLatlngs[i], arrLatlngs[i - 1], (c / (arrowCount + 1)), mapObj), { icon: icon }));
+    }
+}
+return result;
+}
+
+function getAngle(latLng1, latlng2, coef) {
+var dy = latlng2[0] - latLng1[0];
+var dx = Math.cos(Math.PI / 180 * latLng1[0]) * (latlng2[1] - latLng1[1]);
+var ang = ((Math.atan2(dy, dx) / Math.PI) * 180 * coef);
+return (ang).toFixed(2);
+}
+
+function myMidPoint(latlng1, latlng2, per, mapObj) {
+if (!mapObj)
+    throw new Error('map is not defined');
+
+var halfDist, segDist, dist, p1, p2, ratio,
+    points = [];
+
+p1 = mapObj.project(new L.latLng(latlng1));
+p2 = mapObj.project(new L.latLng(latlng2));
+
+halfDist = distanceTo(p1, p2) * per;
+
+if (halfDist === 0)
+    return mapObj.unproject(p1);
+
+dist = distanceTo(p1, p2);
+
+if (dist > halfDist) {
+    ratio = (dist - halfDist) / dist;
+    var res = mapObj.unproject(new Point(p2.x - ratio * (p2.x - p1.x), p2.y - ratio * (p2.y - p1.y)));
+    return [res.lat, res.lng];
+}
+
+}
+
+function distanceTo(p1, p2) {
+var x = p2.x - p1.x,
+    y = p2.y - p1.y;
+
+return Math.sqrt(x * x + y * y);
+}
+
+function toPoint(x, y, round) {
+if (x instanceof Point) {
+    return x;
+}
+if (isArray(x)) {
+    return new Point(x[0], x[1]);
+}
+if (x === undefined || x === null) {
+    return x;
+}
+if (typeof x === 'object' && 'x' in x && 'y' in x) {
+    return new Point(x.x, x.y);
+}
+return new Point(x, y, round);
+}
+
+function Point(x, y, round) {
+this.x = (round ? Math.round(x) : x);
+this.y = (round ? Math.round(y) : y);
+}
+
+
+
+const 
+  flyTime = 1,
+  t1coor = defaultCoor, 
+  t3coor = [1.5,30.791833],
+  t4coor = [3.060129, 30.791908],
+  t5coor = [2.967306,30.843861],
+  t6coor = [2.7125,31.2],
+  t7coor = [2.458833,31.507806],
+  t8coor = [1.3757,32],
+  t9coor = [0.292722,32.569806],
+  t10coor = [0.63775,34.267861],
+  t11coor = [-1.2977, 36.8251],
+
+  point4_7 = [t4coor,t7coor],
+  point5_7 = [t5coor,t7coor],
+  point7_9 = [t7coor,t9coor],
+  point9_10 = [t9coor,t10coor],
+  point10_11 = [t10coor,t11coor],
+
+  line4_7 = L.polyline(point4_7, {color: '#F6A21E', weight: 1, opacity:0}).addTo(mymap),
+  line5_7 = L.polyline(point5_7, {color: '#F6A21E', weight: 1, opacity:0}).addTo(mymap),
+  line7_9 = L.polyline(point7_9, {color: '#F6A21E', weight: 1, opacity:0}).addTo(mymap),
+  line9_10 = L.polyline(point9_10, {color: '#F6A21E', weight: 1, opacity:0}).addTo(mymap),
+  line10_11 = L.polyline(point10_11, {color: '#F6A21E', weight: 1, opacity:0}).addTo(mymap),
+  arrow4_7 = L.featureGroup(getArrows(point4_7, '#F6A21E', 1,mymap)),
+  arrow5_7 = L.featureGroup(getArrows(point5_7, '#F6A21E', 1,mymap)),
+  arrow7_9 = L.featureGroup(getArrows(point7_9, '#F6A21E', 1,mymap)),
+  arrow9_10 = L.featureGroup(getArrows(point9_10, '#F6A21E', 1,mymap)),
+  arrow10_11 = L.featureGroup(getArrows(point10_11, '#F6A21E', 1,mymap)),
+
+  uganda_coor = [0.8, 31],
+  uganda_coor2 = [0.0438, 29.72],
+  uganda_coor3 = [3.0605, 30.7907],
+  uganda_coor4 = [2.967306,30.9],
+  drcongo_coor = [0.8, 29],
+  drcongo_coor2 = [0.0438, 29.7195],
+  drcongo_coor3 = [3.061, 30.7907],
+  drcongo_coor4 = [2.967306,30.8],
+  rwanda_coor = [-1.979115, 30],
+  kenya_coor = [0.0438, 34.5],
+  tanzania_coor = [-1.979115,32],
+  burundi_coor = [-3.40, 29.95],
+  
+  redt1Marker = L.marker(t1coor, {
+    icon: redIcon,
+  }).addTo(mymap).bindTooltip('<b>Mpondwe</b>', {
+    permanent: true,
+    direction: 'bottom'
+  }).openTooltip(),
+  redt3Marker = L.marker(t3coor, {
+    icon: redIcon,
+  }),
+  redt4Marker = L.marker(t4coor, {
+    icon: redIcon,
+  }).bindTooltip('<b>Lia</b>', {
+    permanent: true,
+    direction: 'top'
+  }).openTooltip(),
+  redt5Marker = L.marker(t5coor, {
+    icon: redIcon,
+  }).bindTooltip('<b>Paidha</b>', {
+    permanent: true,
+    direction: 'bottom'
+  }).openTooltip(),
+  redt6Marker = L.marker(t6coor, {
+    icon: redIcon,
+  }),
+  redt7Marker = L.marker(t7coor, {
+    icon: redIcon,
+  }).bindTooltip('<b>Packwach</b>', {
+    permanent: true,
+    direction: 'bottom'
+  }).openTooltip(),
+  redt8Marker = L.marker(t8coor, {
+    icon: redIcon,
+  }),
+  redt9Marker = L.marker(t9coor, {
+    icon: redIcon,
+  }).bindTooltip('<b>Kampala</b>', {
+    permanent: true,
+    direction: 'bottom'
+  }).openTooltip(),
+  redt10Marker = L.marker(t10coor, {
+    icon: redIcon,
+  }).bindTooltip('<b>Malaba</b>', {
+    permanent: true,
+    direction: 'top'
+  }).openTooltip(),
+  redt11Marker = L.marker(t11coor, {
+    icon: redIcon,
+  }).bindTooltip('<b>Nairobi</b>', {
+    permanent: true,
+    direction: 'top'
+  }).openTooltip(),
+  uganda_label = L.tooltip({
+    direction: 'right',
+    className: 'countryLabel'})
+    .setLatLng(uganda_coor)
+    .setContent('UGANDA')
+    .addTo(mymap),
+  uganda_label2 = L.tooltip({
+    direction: 'right',
+    className: 'countryLabel'})
+    .setLatLng(uganda_coor2)
+    .setContent('UGANDA'),
+  uganda_label3 = L.tooltip({
+    direction: 'bottom',
+    className: 'countryLabel'})
+    .setLatLng(uganda_coor3)
+    .setContent('UGANDA'),  
+  uganda_label4 = L.tooltip({
+    direction: 'right',
+    className: 'countryLabel'})
+    .setLatLng(uganda_coor4)
+    .setContent('UGANDA'),  
+  drcongo_label = L.tooltip({
+    direction: 'left',
+    className: 'countryLabel'})
+    .setLatLng(drcongo_coor)
+    .setContent('DEMOCRATIC<br>REPUBLIC<br>OF CONGO')
+    .addTo(mymap),
+  drcongo_label2 = L.tooltip({
+    direction: 'left',
+    className: 'countryLabel'})
+    .setLatLng(drcongo_coor2)
+    .setContent('DEMOCRATIC<br>REPUBLIC<br>OF CONGO'),
+  drcongo_label3 = L.tooltip({
+    direction: 'top',
+    className: 'countryLabel'})
+    .setLatLng(drcongo_coor3)
+    .setContent('DEMOCRATIC<br>REPUBLIC<br>OF CONGO'),
+  drcongo_label4 = L.tooltip({
+    direction: 'left',
+    className: 'countryLabel'})
+    .setLatLng(drcongo_coor4)
+    .setContent('DEMOCRATIC<br>REPUBLIC<br>OF CONGO'),
+  rwanda_label = L.tooltip({
+    direction: 'center',
+    className: 'countryLabel'})
+    .setLatLng(rwanda_coor)
+    .setContent('RWANDA')
+    .addTo(mymap),
+  kenya_label = L.tooltip({
+    direction: 'right',
+    className: 'countryLabel'})
+    .setLatLng(kenya_coor)
+    .setContent('KENYA')
+    .addTo(mymap),
+  tanzania_label = L.tooltip({
+    direction: 'center',
+    className: 'countryLabel'})
+    .setLatLng(tanzania_coor)
+    .setContent('TANZANIA')
+    .addTo(mymap);
+  burundi_label = L.tooltip({
+    direction: 'center',
+    className: 'countryLabel'})
+    .setLatLng(burundi_coor)
+    .setContent('BURUNDI')
+    .addTo(mymap);    
+
+//waypoint transition
+const offsetVal = '70%';
+
+new Waypoint({
+  element: document.getElementById('t1'),
+  handler: direction => {
+    if (direction === 'down') {
+      $('.scroll-logo').hide();
+      mymap.flyTo(t1coor, incidentZoom, {
+      duration: flyTime
+      });
+      redt1Marker.setTooltipContent('<b>Border control office,<br>Mpondwe</b>');
+      uganda_label2.addTo(mymap);
+      drcongo_label2.addTo(mymap);
+    } else {
+      mymap.flyTo(t1coor, defaultZoom, {
+      duration: flyTime
+      });
+      redt1Marker.setTooltipContent('<b>Mpondwe</b>');
+      uganda_label2.remove();
+      drcongo_label2.remove();
+    }
+  },
+  offset: offsetVal,
+});
+
+new Waypoint({
+  element: document.getElementById('t3'),
+  handler: direction => {
+    if (direction === 'down') {
+      mymap.flyTo(t3coor, defaultZoom, {
+      duration: flyTime
+      });
+      redt4Marker.addTo(mymap);
+      redt1Marker.setIcon(dimIcon);
+      redt1Marker.setTooltipContent('<b>Mpondwe</b>')
+      uganda_label2.remove();
+      drcongo_label2.remove();
+    } else {
+      mymap.flyTo(t1coor, incidentZoom, {
+      duration: flyTime
+      });
+      redt4Marker.remove();
+      redt1Marker.setIcon(redIcon);
+      uganda_label2.addTo(mymap);
+      drcongo_label2.addTo(mymap);
+      redt1Marker.setTooltipContent('<b>Border control office,<br>Mpondwe</b>');
+    }
+  },
+  offset: offsetVal,
+});
+
+new Waypoint({
+  element: document.getElementById('t4'),
+  handler: direction => {
+    if (direction === 'down') {
+      mymap.flyTo(t4coor, incidentZoom, {
+      duration: flyTime
+      });
+      uganda_label3.addTo(mymap);
+      drcongo_label3.addTo(mymap);
+    } else {
+      mymap.flyTo(t3coor, defaultZoom, {
+      duration: flyTime
+      });
+      uganda_label3.remove();
+      drcongo_label3.remove();
+    }
+  },
+  offset: offsetVal,
+});
+
+new Waypoint({
+  element: document.getElementById('t5'),
+  handler: direction => {
+    if (direction === 'down') {
+      mymap.flyTo(t5coor, 11, {
+      duration: flyTime
+      });
+      redt5Marker.addTo(mymap);
+      redt4Marker.setIcon(dimIcon);
+      uganda_label4.addTo(mymap);
+      drcongo_label4.addTo(mymap);
+      uganda_label3.remove();
+      drcongo_label3.remove();
+    } else {
+      mymap.flyTo(t4coor, incidentZoom, {
+      duration: flyTime
+      });
+      redt5Marker.remove();
+      redt4Marker.setIcon(redIcon);
+      uganda_label4.remove();
+      drcongo_label4.remove();
+      uganda_label3.addTo(mymap);
+      drcongo_label3.addTo(mymap);
+    }
+  },
+  offset: offsetVal,
+});
+
+new Waypoint({
+  element: document.getElementById('t6'),
+  handler: direction => {
+    if (direction === 'down') {
+      mymap.flyTo(t6coor, 9, {
+      duration: flyTime
+      });
+      redt7Marker.addTo(mymap);
+      redt5Marker.setIcon(dimIcon);
+      uganda_label4.remove();
+      drcongo_label4.remove();
+      line4_7.setStyle({opacity: 1});
+      arrow4_7.addTo(mymap);  
+      line5_7.setStyle({opacity: 1});
+      arrow5_7.addTo(mymap);  
+    } else {
+      mymap.flyTo(t5coor, 11, {
+      duration: flyTime
+      });
+      redt7Marker.remove();
+      redt5Marker.setIcon(redIcon);
+      uganda_label4.addTo(mymap);
+      drcongo_label4.addTo(mymap);
+      line4_7.setStyle({opacity: 0});
+      arrow4_7.remove();
+      line5_7.setStyle({opacity: 0});
+      arrow5_7.remove();
+    }
+  },
+  offset: offsetVal,
+});
+
+new Waypoint({
+  element: document.getElementById('t7'),
+  handler: direction => {
+    if (direction === 'down') {
+      mymap.flyTo(t7coor, incidentZoom, {
+      duration: flyTime
+      });
+      redt7Marker.setTooltipContent('<b>River Nile Bridge,<br>Packwach</b>');
+      line4_7.setStyle({opacity: 0});
+      arrow4_7.remove();
+      line5_7.setStyle({opacity: 0});
+      arrow5_7.remove();
+    } else {
+      mymap.flyTo(t6coor, 9, {
+      duration: flyTime
+      });
+      redt7Marker.setTooltipContent('<b>Packwach</b>');
+      line4_7.setStyle({opacity: 1});
+      arrow4_7.addTo(mymap);  
+      line5_7.setStyle({opacity: 1});
+      arrow5_7.addTo(mymap);  
+    }
+  },
+  offset: offsetVal,
+});
+
+new Waypoint({
+  element: document.getElementById('t8'),
+  handler: direction => {
+    if (direction === 'down') {
+      mymap.flyTo(t8coor, defaultZoom, {
+      duration: flyTime
+      });
+      redt9Marker.addTo(mymap);
+      redt7Marker.setIcon(dimIcon);
+      redt7Marker.setTooltipContent('<b>Packwach</b>')
+      line4_7.setStyle({opacity: 1});
+      arrow4_7.addTo(mymap);  
+      line5_7.setStyle({opacity: 1});
+      arrow5_7.addTo(mymap);  
+      line7_9.setStyle({opacity: 1});
+      arrow7_9.addTo(mymap);
+
+    } else {
+      mymap.flyTo(t7coor, incidentZoom, {
+      duration: flyTime
+      });
+      redt9Marker.remove();
+      redt7Marker.setIcon(redIcon);
+      redt7Marker.setTooltipContent('<b>River Nile Bridge,<br>Packwach</b>')
+      line4_7.setStyle({opacity: 0});
+      arrow4_7.remove();
+      line5_7.setStyle({opacity: 0});
+      arrow5_7.remove();
+      line7_9.setStyle({opacity: 0});
+      arrow7_9.remove();
+    }
+  },
+  offset: offsetVal,
+});
+
+new Waypoint({
+  element: document.getElementById('t9'),
+  handler: direction => {
+    if (direction === 'down') {
+      mymap.flyTo(t9coor, 18, {
+      duration: flyTime
+      });
+      redt9Marker.setTooltipContent('<b>Ndeeba timber market,<br>Kampala</b>')
+      line7_9.setStyle({opacity: 0});
+      arrow7_9.remove();
+    } else {
+      mymap.flyTo(t8coor, defaultZoom, {
+      duration: flyTime
+      });
+      redt9Marker.setTooltipContent('<b>Kampala</b>')
+      line7_9.setStyle({opacity: 1});
+      arrow7_9.addTo(mymap);
+    }
+  },
+  offset: offsetVal,
+});
+
+new Waypoint({
+  element: document.getElementById('t10'),
+  handler: direction => {
+    if (direction === 'down') {
+      mymap.flyTo(t10coor, defaultZoom, {
+      duration: flyTime
+      });
+      redt10Marker.addTo(mymap);
+      redt11Marker.addTo(mymap);
+      redt11Marker.setIcon(dimIcon);
+      redt9Marker.setIcon(dimIcon);
+      redt9Marker.setTooltipContent('<b>Kampala</b>')
+      line7_9.setStyle({opacity: 1});
+      arrow7_9.addTo(mymap);
+      line9_10.setStyle({opacity: 1});
+      arrow9_10.addTo(mymap);
+      line10_11.setStyle({opacity: 1});
+      arrow10_11.addTo(mymap);
+    } else {
+      mymap.flyTo(t9coor, incidentZoom, {
+      duration: flyTime
+      });
+      redt10Marker.remove();
+      redt11Marker.remove();
+      redt9Marker.setIcon(redIcon);
+      redt9Marker.setTooltipContent('<b>Ndeeba timber market,<br>Kampala</b>')
+      line7_9.setStyle({opacity: 0});
+      arrow7_9.remove();
+      line9_10.setStyle({opacity: 0});
+      arrow9_10.remove();
+      line10_11.setStyle({opacity: 0});
+      arrow10_11.remove();
+    }
+  },
+  offset: offsetVal,
+});
+</script>
+</body>
+</html>
