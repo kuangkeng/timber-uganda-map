@@ -60,6 +60,26 @@ body {
   margin: auto 0px;
   z-index: 0 !important;
 }
+.imagebox { 
+  height: 600px; 
+  width: 100%;
+  /* max-width: 800px; */
+  margin: 0 auto;
+  position: fixed;
+  top:0px;
+  margin: auto 0px;
+  z-index: 100 !important;
+  background-color: rgba(0,0,0,0);
+  background-image: url("");
+  background-size: contain;
+  /* background-size: 100% 100%; */
+  background-position: center center;
+  background-repeat:no-repeat;
+  -webkit-background-size:contain;
+  -moz-background-size:contain;
+  -o-background-size:contain;
+  display: none;
+}
 
 .leaflet-bottom {
 	bottom: 1rem;
@@ -182,6 +202,7 @@ ul {
         </g>
        </svg>       
     </div>
+    <div class="imagebox"></div>
     <div class="mapbox" id="map-container" ></div>
     <div id="map-texts">
       <div class="container">
@@ -190,7 +211,7 @@ ul {
           </li>
           <li id="t1" class="scroll-text">
             <!-- zoom out to show the border between Uganda and DRC -->
-            <p>Mpondwe border, for years, was the main entry route for Congolese timber destined to Uganda as well as that in transit to other countries.</p>
+            <p>Mpondwe border, located in midwestern Uganda for years, was the main entry route for Congolese timber destined to Uganda as well as that in transit to other countries.</p>
           </li>
           <li id="t2" class="scroll-text">
             <!-- Zoom in to Mpondwe -->
@@ -204,9 +225,13 @@ ul {
             <!-- zoom to Lia -->
             <p>Lia has become the main point for Congolese timber entering Uganda, our investigation reveals. Timber undergoes no scrutiny and is cleared with fake documents to enter Uganda for local market or in transit to other countries like Kenya.</p> 
           </li>
+          <li id="t4_5" class="scroll-text">
+            <!-- zoom to Lia -->
+            <p>Evidence of satellite images show that though there was no timber at Lia in 2020, by the end of 2022, sawn timber piles organised in bundles extended to a distance of about 300 metres. New areas were being cleared fast to create more space – indicative of increased volumes – where timber could be temporarily stored.</p> 
+          </li>
           <li id="t5" class="scroll-text">
             <!-- Zoom out and show Paidha -->
-            <p>Beyond official border points where timber is cleared through bribery or with fake documents, there are unofficial entry points where traders in DRC and those in Uganda coordinate and move timber into Uganda mostly at night. That timber too ends up in the Kampala market.</p>
+            <p>Beyond official border points where timber is cleared through with fake documents, there are many unofficial entry points such as Paidha, located about 15kms where traders in DRC and those in Uganda coordinate and move timber into Uganda illegally mostly at night. This timber too ends up in the Kampala market.</p>
           </li>
           <li id="t6" class="scroll-text">
             <!-- Pan to River Nile Bridge, zoom out -->
@@ -214,11 +239,11 @@ ul {
           </li>
           <li id="t7" class="scroll-text">
             <!-- Zoom in to River Nile Bridge -->
-            <p>The Pakwach check point is manned by many government law enforcement agencies including National Forestry Authority which are supposed to ensure that only legal products pass. Illegal timber from Congo passes through the checkpoint.</p>
+            <p>The Pakwach check point is manned by many government law enforcement agencies including National Forestry Authority which are supposed to ensure that only legal products pass. But according to people interviewed,  timber from Congo without any document – even fake documents – from Congo passes through the checkpoint.</p>
           </li>
           <li id="t8" class="scroll-text">
             <!-- Zoom out and pan to Kampala -->
-            <p>Much of the timber from DRC ends up in large furniture making companies in Kampala. Timber also goes to large timber markets like Ndeeba, situated in the capital city. It's from these markets that the much loved Congolese timber is sold to small scale and medium scale furniture making companies.</p>
+            <p>Much of the timber from DRC ends up in large furniture making companies in Kampala.</p>
           </li>
           <li id="t9" class="scroll-text">
             <!-- Zoom to Ndeeba -->
@@ -227,6 +252,10 @@ ul {
           <li id="t10" class="scroll-text">
             <!-- Zoom out to include Malaba border and Kenya, draw arrow to Kenya -->
             <p>Uganda is the main transit for Congolese timber that goes to Kenya. Timber passes through Malaba border which is the main border between Kenya and Uganda.</p> 
+          </li>
+          <li id="t11" class="scroll-text">
+            <!-- Zoom out to include Malaba border and Kenya, draw arrow to Kenya -->
+            <p>At Malaba border, trucks arrive overloaded beyond the 26 legally acceptable tonnes. Once they are cleared, they enter Kenya and first stop at a private weighbridge situated two kilometres from the border, where they unload excess load and proceed to their final destination with only the allowable weight.</p> 
           </li>
           <li id="t16" class="scroll-text"></li>
           <li id="tlast" class="scroll-text"></li>
@@ -244,9 +273,11 @@ var incidentZoom;
 if(window.innerWidth>500){
   defaultZoom = 7;
   incidentZoom = 17.5;
+  t4_5zoom = 17.9;
 } else if(window.innerWidth<500){
   defaultZoom = 6;
   incidentZoom = 16.5;
+  t4_5zoom = 16.8;
 }
 L.mapbox.accessToken = 'pk.eyJ1Ijoia3VhbmdrZW5nIiwiYSI6ImNsNXVibXhrNzBlNzUzamxhaHlrbHJsemcifQ.pi3jb5qDip_6YHTMDxDO5Q';
 // switch to this token when it is live on github
@@ -259,7 +290,7 @@ var mymap = L.map('map-container',{
   dragging:false, 
   zoomSnap:0.1,
   doubleClickZoom: false,
-  maxZoom:18,
+  maxZoom:20,
   minZoom:1,
 }).setView(defaultCoor, defaultZoom);
 
@@ -394,19 +425,33 @@ const
   t1coor = defaultCoor, 
   t3coor = [1.5,30.791833],
   t4coor = [3.060129, 30.791908],
+  t4_5coor = [3.0595, 30.791412],
   t5coor = [2.967306,30.843861],
   t6coor = [2.7125,31.2],
   t7coor = [2.458833,31.507806],
   t8coor = [1.3757,32],
   t9coor = [0.292722,32.569806],
-  t10coor = [0.63775,34.267861],
-  t11coor = [-1.2977, 36.8251],
+  t10coor = [0.62861, 34.30591],
+
+  uganda_coor = [0.8, 31],
+  uganda_coor2 = [0.0438, 29.72],
+  uganda_coor3 = [3.0587, 30.7907],
+  uganda_coor4 = [2.967306,30.9],
+  drcongo_coor = [0.8, 29],
+  drcongo_coor2 = [0.0438, 29.7195],
+  drcongo_coor3 = [3.061, 30.7907],
+  drcongo_coor4 = [2.967306,30.8],
+  rwanda_coor = [-1.979115, 30],
+  kenya_coor = [0.0438, 34.5],
+  tanzania_coor = [-1.979115,32],
+  burundi_coor = [-3.40, 29.95],
+  nairobi_coor = [-1.2977, 36.8251],
 
   point4_7 = [t4coor,t7coor],
   point5_7 = [t5coor,t7coor],
   point7_9 = [t7coor,t9coor],
   point9_10 = [t9coor,t10coor],
-  point10_11 = [t10coor,t11coor],
+  point10_11 = [t10coor,nairobi_coor],
 
   line4_7 = L.polyline(point4_7, {color: '#F6A21E', weight: 1, opacity:0}).addTo(mymap),
   line5_7 = L.polyline(point5_7, {color: '#F6A21E', weight: 1, opacity:0}).addTo(mymap),
@@ -419,19 +464,6 @@ const
   arrow9_10 = L.featureGroup(getArrows(point9_10, '#F6A21E', 1,mymap)),
   arrow10_11 = L.featureGroup(getArrows(point10_11, '#F6A21E', 1,mymap)),
 
-  uganda_coor = [0.8, 31],
-  uganda_coor2 = [0.0438, 29.72],
-  uganda_coor3 = [3.0605, 30.7907],
-  uganda_coor4 = [2.967306,30.9],
-  drcongo_coor = [0.8, 29],
-  drcongo_coor2 = [0.0438, 29.7195],
-  drcongo_coor3 = [3.061, 30.7907],
-  drcongo_coor4 = [2.967306,30.8],
-  rwanda_coor = [-1.979115, 30],
-  kenya_coor = [0.0438, 34.5],
-  tanzania_coor = [-1.979115,32],
-  burundi_coor = [-3.40, 29.95],
-  
   redt1Marker = L.marker(t1coor, {
     icon: redIcon,
   }).addTo(mymap).bindTooltip('<b>Mpondwe</b>', {
@@ -477,7 +509,7 @@ const
     permanent: true,
     direction: 'top'
   }).openTooltip(),
-  redt11Marker = L.marker(t11coor, {
+  redt11Marker = L.marker(nairobi_coor, {
     icon: redIcon,
   }).bindTooltip('<b>Nairobi</b>', {
     permanent: true,
@@ -623,6 +655,29 @@ new Waypoint({
 });
 
 new Waypoint({
+  element: document.getElementById('t4_5'),
+  handler: direction => {
+    if (direction === 'down') {
+      $('.imagebox').css('background-image','url("./img/t4_5.jpg")');
+      mymap.flyTo(t4_5coor, t4_5zoom, {
+        duration: flyTime
+      });
+      setTimeout(function(){
+        $('.imagebox').fadeIn(300); 
+      }, 1100);
+    } else {
+      $('.imagebox').fadeOut(300, function (){ 
+        $('.imagebox').css('background-image','url("")');
+      });
+      mymap.flyTo(t4coor, incidentZoom, {
+        duration: flyTime
+      });
+    }
+  },
+  offset: offsetVal,
+});
+
+new Waypoint({
   element: document.getElementById('t5'),
   handler: direction => {
     if (direction === 'down') {
@@ -635,8 +690,11 @@ new Waypoint({
       drcongo_label4.addTo(mymap);
       uganda_label3.remove();
       drcongo_label3.remove();
+      $('.imagebox').fadeOut(300, function (){ 
+        $('.imagebox').css('background-image','url("")');
+      });
     } else {
-      mymap.flyTo(t4coor, incidentZoom, {
+      mymap.flyTo(t4_5coor, incidentZoom, {
       duration: flyTime
       });
       redt5Marker.remove();
@@ -645,6 +703,8 @@ new Waypoint({
       drcongo_label4.remove();
       uganda_label3.addTo(mymap);
       drcongo_label3.addTo(mymap);
+      $('.imagebox').css('background-image','url("./img/t4_5.jpg")');
+      $('.imagebox').fadeIn(300); 
     }
   },
   offset: offsetVal,
@@ -797,6 +857,36 @@ new Waypoint({
       arrow9_10.remove();
       line10_11.setStyle({opacity: 0});
       arrow10_11.remove();
+    }
+  },
+  offset: offsetVal,
+});
+
+new Waypoint({
+  element: document.getElementById('t11'),
+  handler: direction => {
+    if (direction === 'down') {
+      $('.imagebox').css('background-image','url("./img/t11.jpg")');
+      mymap.flyTo(t10coor, t4_5zoom, {
+      duration: flyTime
+      });
+      setTimeout(function(){
+        $('.imagebox').fadeIn(300); 
+      }, 1500);
+      line9_10.setStyle({opacity: 0});
+      line10_11.setStyle({opacity: 0});
+      // arrow7_9.remove();
+    } else {
+      $('.imagebox').fadeOut(300, function (){ 
+        $('.imagebox').css('background-image','url("")');
+      });
+      mymap.flyTo(t10coor, defaultZoom, {
+      duration: flyTime
+      });
+      line9_10.setStyle({opacity: 1});
+      line10_11.setStyle({opacity: 1});
+      
+      // arrow7_9.addTo(mymap);
     }
   },
   offset: offsetVal,
