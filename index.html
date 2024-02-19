@@ -176,7 +176,7 @@ ul {
     padding: 10px;
   }
   .scroll-text p {
-    font-size: 15px;
+    font-size: 16px;
     line-height: 140%;
   }
   .container {
@@ -670,6 +670,8 @@ new Waypoint({
       setTimeout(function(){
         $('.imagebox').fadeIn(300); 
       }, 1100);
+      uganda_label3.remove();
+      drcongo_label3.remove();
     } else {
       $('.imagebox').fadeOut(300, function (){ 
         $('.imagebox').css('background-image','url("")');
@@ -677,6 +679,8 @@ new Waypoint({
       mymap.flyTo(t4coor, incidentZoom, {
         duration: flyTime
       });
+      uganda_label3.addTo(mymap);
+      drcongo_label3.addTo(mymap);
     }
   },
   offset: offsetVal,
@@ -693,8 +697,6 @@ new Waypoint({
       redt4Marker.setIcon(dimIcon);
       uganda_label4.addTo(mymap);
       drcongo_label4.addTo(mymap);
-      uganda_label3.remove();
-      drcongo_label3.remove();
       $('.imagebox').fadeOut(300, function (){ 
         $('.imagebox').css('background-image','url("")');
       });
@@ -706,8 +708,6 @@ new Waypoint({
       redt4Marker.setIcon(redIcon);
       uganda_label4.remove();
       drcongo_label4.remove();
-      uganda_label3.addTo(mymap);
-      drcongo_label3.addTo(mymap);
       $('.imagebox').css('background-image','url("./img/t4_5.jpg")');
       $('.imagebox').fadeIn(300); 
     }
@@ -849,7 +849,7 @@ new Waypoint({
       line10_11.setStyle({opacity: 1});
       arrow10_11.addTo(mymap);
     } else {
-      mymap.flyTo(t9coor, incidentZoom, {
+      mymap.flyTo(t9coor, 18.5, {
       duration: flyTime
       });
       redt10Marker.remove();
