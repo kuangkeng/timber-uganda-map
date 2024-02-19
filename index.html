@@ -274,13 +274,15 @@ var incidentZoom;
 if(window.innerWidth>500){
   defaultZoom = 7;
   incidentZoom = 17.5;
-  t4_5zoom = 17.9;
+  t4_5zoom = 18;
   t11zoom = 18.8;
+  t4_5img = 'url("./img/t4_5.jpg")';
 } else if(window.innerWidth<500){
   defaultZoom = 6;
   incidentZoom = 16.5;
-  t4_5zoom = 16.8;
+  t4_5zoom = 17.3;
   t11zoom = 17.7;
+  t4_5img = 'url("./img/t4_5m.jpg")';
 }
 L.mapbox.accessToken = 'pk.eyJ1Ijoia3VhbmdrZW5nIiwiYSI6ImNsNXVibXhrNzBlNzUzamxhaHlrbHJsemcifQ.pi3jb5qDip_6YHTMDxDO5Q';
 // switch to this token when it is live on github
@@ -422,14 +424,12 @@ this.x = (round ? Math.round(x) : x);
 this.y = (round ? Math.round(y) : y);
 }
 
-
-
 const 
   flyTime = 1,
   t1coor = defaultCoor, 
   t3coor = [1.5,30.791833],
   t4coor = [3.060129, 30.791908],
-  t4_5coor = [3.0595, 30.791412],
+  t4_5coor = [3.0595, 30.7915],
   t5coor = [2.967306,30.843861],
   t6coor = [2.7125,31.2],
   t7coor = [2.458833,31.507806],
@@ -662,7 +662,7 @@ new Waypoint({
   element: document.getElementById('t4_5'),
   handler: direction => {
     if (direction === 'down') {
-      $('.imagebox').css('background-image','url("./img/t4_5.jpg")');
+      $('.imagebox').css('background-image',t4_5img);
       mymap.flyTo(t4_5coor, t4_5zoom, {
         duration: flyTime
       });
@@ -700,14 +700,14 @@ new Waypoint({
         $('.imagebox').css('background-image','url("")');
       });
     } else {
-      mymap.flyTo(t4_5coor, incidentZoom, {
+      mymap.flyTo(t4_5coor, t4_5zoom, {
       duration: flyTime
       });
       redt5Marker.remove();
       redt4Marker.setIcon(redIcon);
       uganda_label4.remove();
       drcongo_label4.remove();
-      $('.imagebox').css('background-image','url("./img/t4_5.jpg")');
+      $('.imagebox').css('background-image',t4_5img);
       $('.imagebox').fadeIn(300); 
     }
   },
