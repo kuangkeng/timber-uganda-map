@@ -278,6 +278,7 @@ var incidentZoom;
 if(window.innerWidth>500){
   defaultZoom = 7;
   incidentZoom = 17.5;
+  t4zoom = 17.3;
   t4_5zoom = 18;
   t11zoom = 18.8;
   t4_5img = 'url("./img/t4_5.jpg")';
@@ -285,6 +286,7 @@ if(window.innerWidth>500){
 } else if(window.innerWidth<500){
   defaultZoom = 6;
   incidentZoom = 16.5;
+  t4zoom = 17;
   t4_5zoom = 17.3;
   t11zoom = 18.7;
   t4_5img = 'url("./img/t4_5m.jpg")';
@@ -293,7 +295,6 @@ if(window.innerWidth>500){
 L.mapbox.accessToken = 'pk.eyJ1Ijoia3VhbmdrZW5nIiwiYSI6ImNsNXVibXhrNzBlNzUzamxhaHlrbHJsemcifQ.pi3jb5qDip_6YHTMDxDO5Q';
 // switch to this token when it is live on github
 // L.mapbox.accessToken = 'pk.eyJ1Ijoia3VhbmdrZW5nIiwiYSI6ImNsczBkYzZlNTAwM3Uya3F4MWJpdWRzanIifQ.SfPO15T7zjMdvdc3XVtoIA';
-
 
 var mymap = L.map('map-container',{
   zoomControl:false, 
@@ -316,7 +317,7 @@ L.tileLayer(
 const redIcon = L.icon.pulse({
   iconSize: [10, 10],
   color: 'rgba(244, 67, 54, 1)',
-}),
+});
 
 dimIcon = L.divIcon({
   html: `
@@ -592,6 +593,38 @@ const
     .setContent('BURUNDI')
     .addTo(mymap);    
 
+
+//Add the border from geojson file
+let BorderLayer;
+fetch('./border.geojson')
+  .then(response => response.json())
+  .then(data => {
+    // Create the GeoJSON layer and store it in the variable
+    BorderLayer = L.geoJSON(data, {
+      style: function (feature) {
+        return {
+          color: 'white', // Customize color here
+          weight: 5,     // Customize thickness here
+          opacity: 0   // Customize opacity here
+        };
+      }
+    }).addTo(mymap);
+  })
+  .catch(error => console.error('Error loading GeoJSON file:', error));
+
+// Function to change the opacity of the GeoJSON layer
+function hideBorderOpacity(opacity) {
+  if (BorderLayer) {
+    BorderLayer.setStyle({ opacity: 0 });
+  }
+}
+
+function showBorderOpacity(opacity) {
+  if (BorderLayer) {
+    BorderLayer.setStyle({ opacity: 0.5 });
+  }
+}
+
 //waypoint transition
 const offsetVal = '70%';
 
@@ -657,17 +690,19 @@ new Waypoint({
   element: document.getElementById('t4'),
   handler: direction => {
     if (direction === 'down') {
-      mymap.flyTo(t4coor, incidentZoom, {
+      mymap.flyTo(t4coor, t4zoom, {
       duration: flyTime
       });
       uganda_label3.addTo(mymap);
       drcongo_label3.addTo(mymap);
+      showBorderOpacity();
     } else {
       mymap.flyTo(t3coor, defaultZoom, {
       duration: flyTime
       });
       uganda_label3.remove();
-      drcongo_label3.remove();
+      drcongo_label3.remove();      
+      hideBorderOpacity();
     }
   },
   offset: offsetVal,
@@ -677,7 +712,6 @@ new Waypoint({
   element: document.getElementById('t4_5'),
   handler: direction => {
     if (direction === 'down') {
-      
       mymap.flyTo(t4_5coor, t4_5zoom, {
         duration: flyTime
       });
@@ -691,7 +725,7 @@ new Waypoint({
       $('.imagebox').fadeOut(300, function (){ 
         $('.imagebox').css('background-image','url("")');
       });
-      mymap.flyTo(t4coor, incidentZoom, {
+      mymap.flyTo(t4coor, t4zoom, {
         duration: flyTime
       });
       uganda_label3.addTo(mymap);
@@ -712,6 +746,7 @@ new Waypoint({
       redt4Marker.setIcon(dimIcon);
       uganda_label4.addTo(mymap);
       drcongo_label4.addTo(mymap);
+      hideBorderOpacity();
       $('.imagebox').fadeOut(300, function (){ 
         $('.imagebox').css('background-image','url("")');
       });
@@ -723,8 +758,11 @@ new Waypoint({
       redt4Marker.setIcon(redIcon);
       uganda_label4.remove();
       drcongo_label4.remove();
-      $('.imagebox').css('background-image',t4_5img);
-      $('.imagebox').fadeIn(300); 
+      showBorderOpacity();
+      setTimeout(function(){
+        $('.imagebox').css('background-image',t4_5img);
+        $('.imagebox').fadeIn(500); 
+      }, 1500);
     }
   },
   offset: offsetVal,
