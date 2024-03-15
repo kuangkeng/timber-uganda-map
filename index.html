@@ -9,6 +9,8 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.0/leaflet.js"></script>
     <script src='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.js'></script>
     <link href='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.css' rel='stylesheet' />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-geometryutil@0.10.3/src/leaflet.geometryutil.js"></script>
+    <script src="../leaflet-arrowheads.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/noframework.waypoints.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-pulse-icon@0.1.0/src/L.Icon.Pulse.css" crossorigin="anonymous" />
     <script src="https://cdn.jsdelivr.net/npm/leaflet-pulse-icon@0.1.0/src/L.Icon.Pulse.js" crossorigin="anonymous"></script>
@@ -292,7 +294,9 @@ if(window.innerWidth>500){
   t4_5img = 'url("./img/t4_5m.jpg")';
   t11img = 'url("./img/t11m.jpg")';
 }
-L.mapbox.accessToken = 'pk.eyJ1Ijoia3VhbmdrZW5nIiwiYSI6ImNsczBkYzZlNTAwM3Uya3F4MWJpdWRzanIifQ.SfPO15T7zjMdvdc3XVtoIA';
+// L.mapbox.accessToken = 'pk.eyJ1Ijoia3VhbmdrZW5nIiwiYSI6ImNsczBkYzZlNTAwM3Uya3F4MWJpdWRzanIifQ.SfPO15T7zjMdvdc3XVtoIA';
+
+L.mapbox.accessToken = 'pk.eyJ1Ijoia3VhbmdrZW5nIiwiYSI6ImNsNXVibXhrNzBlNzUzamxhaHlrbHJsemcifQ.pi3jb5qDip_6YHTMDxDO5Q';
 
 var mymap = L.map('map-container',{
   zoomControl:false, 
@@ -345,89 +349,89 @@ if (window?.chrome !== undefined) {
 }
 
 // function to add arrows to polyline
-function getArrows(arrLatlngs, color, arrowCount, mapObj) {
+// function getArrows(arrLatlngs, color, arrowCount, mapObj) {
 
-if (typeof arrLatlngs === undefined || arrLatlngs == null ||    
-(!arrLatlngs.length) || arrLatlngs.length < 2)          
-return [];
+// if (typeof arrLatlngs === undefined || arrLatlngs == null ||    
+// (!arrLatlngs.length) || arrLatlngs.length < 2)          
+// return [];
 
-if (typeof arrowCount === 'undefined' || arrowCount == null)
-    arrowCount = 1;
+// if (typeof arrowCount === 'undefined' || arrowCount == null)
+//     arrowCount = 1;
 
-if (typeof color === 'undefined' || color == null)
-    color = '';
-else
-    color = 'color:' + color;
+// if (typeof color === 'undefined' || color == null)
+//     color = '';
+// else
+//     color = 'color:' + color;
 
-var result = [];
-for (var i = 1; i < arrLatlngs.length; i++) {
-    var icon = L.divIcon({ className: 'arrow-icon', bgPos: [5, 5], html: '<div style="' + color + ';transform: rotate(' + getAngle(arrLatlngs[i - 1], arrLatlngs[i], -1).toString() + 'deg)">▶</div>' });
-    for (var c = 1; c <= arrowCount; c++) {
-        result.push(L.marker(myMidPoint(arrLatlngs[i], arrLatlngs[i - 1], (c / (arrowCount + 1)), mapObj), { icon: icon }));
-    }
-}
-return result;
-}
+// var result = [];
+// for (var i = 1; i < arrLatlngs.length; i++) {
+//     var icon = L.divIcon({ className: 'arrow-icon', bgPos: [5, 5], html: '<div style="' + color + ';transform: rotate(' + getAngle(arrLatlngs[i - 1], arrLatlngs[i], -1).toString() + 'deg)">▶</div>' });
+//     for (var c = 1; c <= arrowCount; c++) {
+//         result.push(L.marker(myMidPoint(arrLatlngs[i], arrLatlngs[i - 1], (c / (arrowCount + 1)), mapObj), { icon: icon }));
+//     }
+// }
+// return result;
+// }
 
-function getAngle(latLng1, latlng2, coef) {
-var dy = latlng2[0] - latLng1[0];
-var dx = Math.cos(Math.PI / 180 * latLng1[0]) * (latlng2[1] - latLng1[1]);
-var ang = ((Math.atan2(dy, dx) / Math.PI) * 180 * coef);
-return (ang).toFixed(2);
-}
+// function getAngle(latLng1, latlng2, coef) {
+// var dy = latlng2[0] - latLng1[0];
+// var dx = Math.cos(Math.PI / 180 * latLng1[0]) * (latlng2[1] - latLng1[1]);
+// var ang = ((Math.atan2(dy, dx) / Math.PI) * 180 * coef);
+// return (ang).toFixed(2);
+// }
 
-function myMidPoint(latlng1, latlng2, per, mapObj) {
-if (!mapObj)
-    throw new Error('map is not defined');
+// function myMidPoint(latlng1, latlng2, per, mapObj) {
+// if (!mapObj)
+//     throw new Error('map is not defined');
 
-var halfDist, segDist, dist, p1, p2, ratio,
-    points = [];
+// var halfDist, segDist, dist, p1, p2, ratio,
+//     points = [];
 
-p1 = mapObj.project(new L.latLng(latlng1));
-p2 = mapObj.project(new L.latLng(latlng2));
+// p1 = mapObj.project(new L.latLng(latlng1));
+// p2 = mapObj.project(new L.latLng(latlng2));
 
-halfDist = distanceTo(p1, p2) * per;
+// halfDist = distanceTo(p1, p2) * per;
 
-if (halfDist === 0)
-    return mapObj.unproject(p1);
+// if (halfDist === 0)
+//     return mapObj.unproject(p1);
 
-dist = distanceTo(p1, p2);
+// dist = distanceTo(p1, p2);
 
-if (dist > halfDist) {
-    ratio = (dist - halfDist) / dist;
-    var res = mapObj.unproject(new Point(p2.x - ratio * (p2.x - p1.x), p2.y - ratio * (p2.y - p1.y)));
-    return [res.lat, res.lng];
-}
+// if (dist > halfDist) {
+//     ratio = (dist - halfDist) / dist;
+//     var res = mapObj.unproject(new Point(p2.x - ratio * (p2.x - p1.x), p2.y - ratio * (p2.y - p1.y)));
+//     return [res.lat, res.lng];
+// }
 
-}
+// }
 
-function distanceTo(p1, p2) {
-var x = p2.x - p1.x,
-    y = p2.y - p1.y;
+// function distanceTo(p1, p2) {
+// var x = p2.x - p1.x,
+//     y = p2.y - p1.y;
 
-return Math.sqrt(x * x + y * y);
-}
+// return Math.sqrt(x * x + y * y);
+// }
 
-function toPoint(x, y, round) {
-if (x instanceof Point) {
-    return x;
-}
-if (isArray(x)) {
-    return new Point(x[0], x[1]);
-}
-if (x === undefined || x === null) {
-    return x;
-}
-if (typeof x === 'object' && 'x' in x && 'y' in x) {
-    return new Point(x.x, x.y);
-}
-return new Point(x, y, round);
-}
+// function toPoint(x, y, round) {
+// if (x instanceof Point) {
+//     return x;
+// }
+// if (isArray(x)) {
+//     return new Point(x[0], x[1]);
+// }
+// if (x === undefined || x === null) {
+//     return x;
+// }
+// if (typeof x === 'object' && 'x' in x && 'y' in x) {
+//     return new Point(x.x, x.y);
+// }
+// return new Point(x, y, round);
+// }
 
-function Point(x, y, round) {
-this.x = (round ? Math.round(x) : x);
-this.y = (round ? Math.round(y) : y);
-}
+// function Point(x, y, round) {
+// this.x = (round ? Math.round(x) : x);
+// this.y = (round ? Math.round(y) : y);
+// }
 
 const 
   flyTime = 1,
@@ -462,16 +466,17 @@ const
   point7_10 = [t7coor,t10coor],
   point10_11 = [t10coor,nairobi_coor],
 
-  line4_7 = L.polyline(point4_7, {color: '#F6A21E', weight: 1, opacity:0}).addTo(mymap),
-  line5_7 = L.polyline(point5_7, {color: '#F6A21E', weight: 1, opacity:0}).addTo(mymap),
-  line7_9 = L.polyline(point7_9, {color: '#F6A21E', weight: 1, opacity:0}).addTo(mymap),
-  line7_10 = L.polyline(point7_10, {color: '#F6A21E', weight: 1, opacity:0}).addTo(mymap),
-  line10_11 = L.polyline(point10_11, {color: '#F6A21E', weight: 1, opacity:0}).addTo(mymap),
-  arrow4_7 = L.featureGroup(getArrows(point4_7, '#F6A21E', 1,mymap)),
-  arrow5_7 = L.featureGroup(getArrows(point5_7, '#F6A21E', 1,mymap)),
-  arrow7_9 = L.featureGroup(getArrows(point7_9, '#F6A21E', 1,mymap)),
-  arrow7_10 = L.featureGroup(getArrows(point7_10, '#F6A21E', 1,mymap)),
-  arrow10_11 = L.featureGroup(getArrows(point10_11, '#F6A21E', 1,mymap)),
+  // line4_7 = L.polyline(point4_7, {color: '#F6A21E', weight: 1, opacity:0}).addTo(mymap),
+  line4_7 = L.polyline(point4_7, {color: '#F6A21E', weight: 1, opacity:1}).arrowheads({size: '5%', fill: true, frequency: '40000m', offsets: {end:'50000m'}}),
+  line5_7 = L.polyline(point5_7, {color: '#F6A21E', weight: 1, opacity:1}).arrowheads({size: '5%', fill: true, frequency: '40000m', offsets: {end:'40000m'}}),
+  line7_9 = L.polyline(point7_9, {color: '#F6A21E', weight: 1, opacity:1}).arrowheads({size: '5%', fill: true, frequency: '150000m', offsets: {end:'100000m'}}),
+  line7_10 = L.polyline(point7_10, {color: '#F6A21E', weight: 1, opacity:1}).arrowheads({size: '5%', fill: true, frequency: '200000m', offsets: {end:'150000m'}}),
+  line10_11 = L.polyline(point10_11, {color: '#F6A21E', weight: 1, opacity:1}).arrowheads({size: '5%', fill: true, frequency: '200000m', offsets: {end:'150000m'}}),
+  // arrow4_7 = L.featureGroup(getArrows(point4_7, '#F6A21E', 1,mymap)),
+  // arrow5_7 = L.featureGroup(getArrows(point5_7, '#F6A21E', 1,mymap)),
+  // arrow7_9 = L.featureGroup(getArrows(point7_9, '#F6A21E', 1,mymap)),
+  // arrow7_10 = L.featureGroup(getArrows(point7_10, '#F6A21E', 1,mymap)),
+  // arrow10_11 = L.featureGroup(getArrows(point10_11, '#F6A21E', 1,mymap)),
 
   redt1Marker = L.marker(t1coor, {
     icon: redIcon,
@@ -775,10 +780,10 @@ new Waypoint({
       redt5Marker.setIcon(dimIcon);
       uganda_label4.remove();
       drcongo_label4.remove();
-      line4_7.setStyle({opacity: 1});
-      arrow4_7.addTo(mymap);  
-      line5_7.setStyle({opacity: 1});
-      arrow5_7.addTo(mymap);  
+      line4_7.addTo(mymap);
+      // arrow4_7.addTo(mymap);  
+      line5_7.addTo(mymap);
+      // arrow5_7.addTo(mymap);  
     } else {
       mymap.flyTo(t5coor, 11, {
       duration: flyTime
@@ -787,10 +792,10 @@ new Waypoint({
       redt5Marker.setIcon(redIcon);
       uganda_label4.addTo(mymap);
       drcongo_label4.addTo(mymap);
-      line4_7.setStyle({opacity: 0});
-      arrow4_7.remove();
-      line5_7.setStyle({opacity: 0});
-      arrow5_7.remove();
+      line4_7.remove();
+      // arrow4_7.remove();
+      line5_7.remove();
+      // arrow5_7.remove();
     }
   },
   offset: offsetVal,
@@ -804,19 +809,23 @@ new Waypoint({
       duration: flyTime
       });
       redt7Marker.setTooltipContent('<b>River Nile Bridge,<br>Packwach</b>');
-      line4_7.setStyle({opacity: 0});
-      arrow4_7.remove();
-      line5_7.setStyle({opacity: 0});
-      arrow5_7.remove();
+      line4_7.remove();
+      line5_7.remove();
+      // line4_7.remove();
+      // line4_7.getArrowheads().remove();
+      // arrow4_7.remove();
+      // line5_7.remove();
+      // line5_7.getArrowheads().remove();
+      // arrow5_7.remove();
     } else {
       mymap.flyTo(t6coor, 9, {
       duration: flyTime
       });
       redt7Marker.setTooltipContent('<b>Packwach</b>');
-      line4_7.setStyle({opacity: 1});
-      arrow4_7.addTo(mymap);  
-      line5_7.setStyle({opacity: 1});
-      arrow5_7.addTo(mymap);  
+      line4_7.addTo(mymap);
+      // arrow4_7.addTo(mymap);  
+      line5_7.addTo(mymap);
+      // arrow5_7.addTo(mymap);  
     }
   },
   offset: offsetVal,
@@ -832,12 +841,12 @@ new Waypoint({
       redt9Marker.addTo(mymap);
       redt7Marker.setIcon(dimIcon);
       redt7Marker.setTooltipContent('<b>Packwach</b>')
-      line4_7.setStyle({opacity: 1});
-      arrow4_7.addTo(mymap);  
-      line5_7.setStyle({opacity: 1});
-      arrow5_7.addTo(mymap);  
-      line7_9.setStyle({opacity: 1});
-      arrow7_9.addTo(mymap);
+      line4_7.addTo(mymap);
+      // arrow4_7.addTo(mymap);  
+      line5_7.addTo(mymap);
+      // arrow5_7.addTo(mymap);  
+      line7_9.addTo(mymap);
+      // arrow7_9.addTo(mymap);
 
     } else {
       mymap.flyTo(t7coor, 17.5, {
@@ -846,12 +855,12 @@ new Waypoint({
       redt9Marker.remove();
       redt7Marker.setIcon(redIcon);
       redt7Marker.setTooltipContent('<b>River Nile Bridge,<br>Packwach</b>')
-      line4_7.setStyle({opacity: 0});
-      arrow4_7.remove();
-      line5_7.setStyle({opacity: 0});
-      arrow5_7.remove();
-      line7_9.setStyle({opacity: 0});
-      arrow7_9.remove();
+      line4_7.remove();
+      // arrow4_7.remove();
+      line5_7.remove();
+      // arrow5_7.remove();
+      line7_9.remove();
+      // arrow7_9.remove();
     }
   },
   offset: offsetVal,
@@ -865,15 +874,15 @@ new Waypoint({
       duration: flyTime
       });
       redt9Marker.setTooltipContent('<b>Ndeeba timber market,<br>Kampala</b>')
-      line7_9.setStyle({opacity: 0});
-      arrow7_9.remove();
+      line7_9.remove();
+      // arrow7_9.remove();
     } else {
       mymap.flyTo(t8coor, defaultZoom, {
       duration: flyTime
       });
       redt9Marker.setTooltipContent('<b>Kampala</b>')
-      line7_9.setStyle({opacity: 1});
-      arrow7_9.addTo(mymap);
+      line7_9.addTo(mymap);
+      // arrow7_9.addTo(mymap);
     }
   },
   offset: offsetVal,
@@ -891,12 +900,12 @@ new Waypoint({
       redt11Marker.setIcon(dimIcon);
       redt9Marker.setIcon(dimIcon);
       redt9Marker.setTooltipContent('<b>Kampala</b>')
-      line7_9.setStyle({opacity: 1});
-      arrow7_9.addTo(mymap);
-      line7_10.setStyle({opacity: 1});
-      arrow7_10.addTo(mymap);
-      line10_11.setStyle({opacity: 1});
-      arrow10_11.addTo(mymap);
+      line7_9.addTo(mymap);
+      // arrow7_9.addTo(mymap);
+      line7_10.addTo(mymap);
+      // arrow7_10.addTo(mymap);
+      line10_11.addTo(mymap);
+      // arrow10_11.addTo(mymap);
     } else {
       mymap.flyTo(t9coor, 18.5, {
       duration: flyTime
@@ -905,12 +914,12 @@ new Waypoint({
       redt11Marker.remove();
       redt9Marker.setIcon(redIcon);
       redt9Marker.setTooltipContent('<b>Ndeeba timber market,<br>Kampala</b>')
-      line7_9.setStyle({opacity: 0});
-      arrow7_9.remove();
-      line7_10.setStyle({opacity: 0});
-      arrow7_10.remove();
-      line10_11.setStyle({opacity: 0});
-      arrow10_11.remove();
+      line7_9.remove();
+      // arrow7_9.remove();
+      line7_10.remove();
+      // arrow7_10.remove();
+      line10_11.remove();
+      // arrow10_11.remove();
     }
   },
   offset: offsetVal,
@@ -928,8 +937,8 @@ new Waypoint({
         $('.imagebox').css('background-image',t11img);
         $('.imagebox').fadeIn(500); 
       }, 2000);
-      line7_10.setStyle({opacity: 0});
-      line10_11.setStyle({opacity: 0});
+      line7_10.remove();
+      line10_11.remove();
     } else {
       $('.imagebox').fadeOut(300, function (){ 
         $('.imagebox').css('background-image','url("")');
@@ -937,8 +946,8 @@ new Waypoint({
       mymap.flyTo(t10coor, defaultZoom, {
       duration: flyTime
       });
-      line7_10.setStyle({opacity: 1});
-      line10_11.setStyle({opacity: 1});
+      line7_10.addTo(mymap);
+      line10_11.addTo(mymap);
     }
   },
   offset: offsetVal,
