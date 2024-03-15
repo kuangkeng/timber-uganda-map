@@ -277,16 +277,16 @@ var incidentZoom;
 
 if(window.innerWidth>500){
   defaultZoom = 7;
-  incidentZoom = 17.5;
-  t4zoom = 17.3;
+  incidentZoom = 16.4;
+  t4zoom = 17.5;
   t4_5zoom = 18;
   t11zoom = 18.8;
   t4_5img = 'url("./img/t4_5.jpg")';
   t11img = 'url("./img/t11.jpg")';
 } else if(window.innerWidth<500){
   defaultZoom = 6;
-  incidentZoom = 16.5;
-  t4zoom = 17;
+  incidentZoom = 16.4;
+  t4zoom = 17.3;
   t4_5zoom = 17.3;
   t11zoom = 18.7;
   t4_5img = 'url("./img/t4_5m.jpg")';
@@ -307,7 +307,7 @@ var mymap = L.map('map-container',{
 }).setView(defaultCoor, defaultZoom);
 
 L.tileLayer(
-    'https://api.mapbox.com/styles/v1/kuangkeng/cls0diajr009101pa8hkz67em/tiles/256/{z}/{x}/{y}@2x?access_token=' + L.mapbox.accessToken, {
+    'https://api.mapbox.com/styles/v1/kuangkeng/cltsbxqmz002l01qsbya83ov7/tiles/256/{z}/{x}/{y}@2x?access_token=' + L.mapbox.accessToken, {
         tileSize: 512,
         maxZoom:20,
         zoomOffset: -1,
@@ -717,8 +717,8 @@ new Waypoint({
       });
       setTimeout(function(){
         $('.imagebox').css('background-image',t4_5img);
-        $('.imagebox').fadeIn(500); 
-      }, 1500);
+        $('.imagebox').fadeIn(300); 
+      }, 1000);
       uganda_label3.remove();
       drcongo_label3.remove();
     } else {
@@ -759,10 +759,8 @@ new Waypoint({
       uganda_label4.remove();
       drcongo_label4.remove();
       showBorderOpacity();
-      setTimeout(function(){
-        $('.imagebox').css('background-image',t4_5img);
-        $('.imagebox').fadeIn(500); 
-      }, 1500);
+      $('.imagebox').css('background-image',t4_5img);
+      $('.imagebox').fadeIn(300); 
     }
   },
   offset: offsetVal,
@@ -804,7 +802,7 @@ new Waypoint({
   element: document.getElementById('t7'),
   handler: direction => {
     if (direction === 'down') {
-      mymap.flyTo(t7coor, incidentZoom, {
+      mymap.flyTo(t7coor, 17.5, {
       duration: flyTime
       });
       redt7Marker.setTooltipContent('<b>River Nile Bridge,<br>Packwach</b>');
@@ -844,7 +842,7 @@ new Waypoint({
       arrow7_9.addTo(mymap);
 
     } else {
-      mymap.flyTo(t7coor, incidentZoom, {
+      mymap.flyTo(t7coor, 17.5, {
       duration: flyTime
       });
       redt9Marker.remove();
