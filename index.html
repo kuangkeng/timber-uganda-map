@@ -10,7 +10,8 @@
     <script src='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.js'></script>
     <link href='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.css' rel='stylesheet' />
     <script src="https://cdn.jsdelivr.net/npm/leaflet-geometryutil@0.10.3/src/leaflet.geometryutil.js"></script>
-    <script src="./leaflet-arrowheads.js"></script>
+    <script src="./leaflet-arrowheads.js"></script> 
+    <!-- Arrowheads is a plugin to create arrows for polylines: https://github.com/slutske22/leaflet-arrowheads -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/noframework.waypoints.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-pulse-icon@0.1.0/src/L.Icon.Pulse.css" crossorigin="anonymous" />
     <script src="https://cdn.jsdelivr.net/npm/leaflet-pulse-icon@0.1.0/src/L.Icon.Pulse.js" crossorigin="anonymous"></script>
@@ -379,17 +380,12 @@ const
   point7_10 = [t7coor,t10coor],
   point10_11 = [t10coor,nairobi_coor],
 
-  // line4_7 = L.polyline(point4_7, {color: '#F6A21E', weight: 1, opacity:0}).addTo(mymap),
+  // Create polylines and their arrows. The arrows are created through a plugin: https://github.com/slutske22/leaflet-arrowheads
   line4_7 = L.polyline(point4_7, {color: '#F6A21E', weight: 1, opacity:1}).arrowheads({size: '10px', fill: true, frequency: '40000m', offsets: {end:'50000m'}}),
   line5_7 = L.polyline(point5_7, {color: '#F6A21E', weight: 1, opacity:1}).arrowheads({size: '10px', fill: true, frequency: '40000m', offsets: {end:'40000m'}}),
   line7_9 = L.polyline(point7_9, {color: '#F6A21E', weight: 1, opacity:1}).arrowheads({size: '10px', fill: true, frequency: '150000m', offsets: {end:'100000m'}}),
   line7_10 = L.polyline(point7_10, {color: '#F6A21E', weight: 1, opacity:1}).arrowheads({size: '10px', fill: true, frequency: '200000m', offsets: {end:'150000m'}}),
   line10_11 = L.polyline(point10_11, {color: '#F6A21E', weight: 1, opacity:1}).arrowheads({size: '10px', fill: true, frequency: '200000m', offsets: {end:'150000m'}}),
-  // arrow4_7 = L.featureGroup(getArrows(point4_7, '#F6A21E', 1,mymap)),
-  // arrow5_7 = L.featureGroup(getArrows(point5_7, '#F6A21E', 1,mymap)),
-  // arrow7_9 = L.featureGroup(getArrows(point7_9, '#F6A21E', 1,mymap)),
-  // arrow7_10 = L.featureGroup(getArrows(point7_10, '#F6A21E', 1,mymap)),
-  // arrow10_11 = L.featureGroup(getArrows(point10_11, '#F6A21E', 1,mymap)),
 
   redt1Marker = L.marker(t1coor, {
     icon: redIcon,
